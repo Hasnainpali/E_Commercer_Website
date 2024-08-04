@@ -27,10 +27,12 @@ export default function Navbar() {
     fetchDataFormApi(`/api/categorys`).then((res) => {
       setCatData(res);
     });
-
-    fetchDataFormApi(`/api/cart`).then((res) => {
-      setCartItem(res.length);
-    });
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user && user.userId) {
+      fetchDataFormApi(`/api/cart?userId=${user?.userId}`).then((res) => {
+        setCartItem(res.length);
+       });
+    } 
   }, []);
 
 
@@ -161,7 +163,7 @@ export default function Navbar() {
                     className="badge text-secondary border border-secondary rounded-circle"
                     style={{ paddingBottom: "2px" }}
                   >
-                    {cartItem}
+                    {cartItem? cartItem :"0"}
                   </span>
                 </Link>
               </div>

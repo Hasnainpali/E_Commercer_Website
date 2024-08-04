@@ -38,6 +38,10 @@ export default function Signin() {
     });
   };
 
+  const handleGoHome = () => {
+    window.location.href = "/"
+  };
+
   const register = async (e) => {
     e.preventDefault();
     setLoading(true)
@@ -356,9 +360,8 @@ export default function Signin() {
             </p>
            <div className="d-flex">
            {/* <Button variant='contained' color='warning' id="signIn">Sign In</Button> */}
-           <Link to='/'>
-           <Button variant='contained' color='warning' className='ml-2'  >Go Home</Button>
-           </Link>
+           <Button variant='contained' color='warning' className='ml-2' onClick={handleGoHome}>Go Home</Button>
+          
            </div>
          </div>
         <div class="overlay-panel overlay-right">
@@ -366,9 +369,7 @@ export default function Signin() {
             <p>Enter your personal details and start journey with us</p>
             <div className="d-flex ">
             {/* <Button variant='contained' color='warning' id="signUp" >Sign Up</Button> */}
-            <Link to='/'>
-              <Button variant='contained' color='warning' className='ml-2'  >Go Home</Button>
-             </Link>
+              <Button variant='contained' color='warning' className='ml-2' onClick={handleGoHome}  >Go Home</Button>
             </div>
         </div>
     </div>

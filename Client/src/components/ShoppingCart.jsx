@@ -3,19 +3,35 @@ import { Link, useNavigate } from 'react-router-dom';
 import './ShoppingCart.css';
 import { deletedata, editdata, fetchDataFormApi } from './utility/Api';
 import { UserContext } from './Context Api/UserAuthContext';
-import {CartContext} from  './Context Api/ShopContext'
+import {CartContext} from  './Context Api/ShopContext';
+import {loadStripe} from '@stripe/stripe-js';
 
 export default function ShoppingCart() {
   const [cartData, setCartData] = useState([]);
   const navigate = useNavigate();
-  const {setAlertBox} = useContext(UserContext);
-  const {setCartItem} = useContext(CartContext)
+  const {setAlertBox, BaseURl} = useContext(UserContext);
+  const {setCartItem} = useContext(CartContext);
+
 
   useEffect(() => {
-    fetchDataFormApi(`/api/cart`).then((res) => {
-      setCartData(res);
-    });
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user && user.userId) {
+      fetchDataFormApi(`/api/cart?userId=${user.userId}`)
+        .then((res) => {
+          if (Array.isArray(res)) {
+            setCartData(res);
+          } else {
+            console.error('Unexpected data format:', res);
+            setCartData([]);
+          }
+        })
+        .catch((error) => {
+          console.error('API error:', error);
+          setCartData([]);
+        });
+    }
   }, []);
+  
 
   const handleQuantityChange = (index, value) => {
     const updatedCartData = [...cartData];
@@ -25,9 +41,12 @@ export default function ShoppingCart() {
   const updatedItem = updatedCartData[index];
     // console.log(updatedItem._id, "updatedCart")
     editdata(`/api/cart/${updatedItem._id}`,{quantity: updatedItem.quantity,subTotal: updatedItem.subTotal}).then((res)=>{
-      fetchDataFormApi(`/api/cart`).then((res) => {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (user && user.userId) {
+        fetchDataFormApi(`/api/cart?userId=${user.userId}`).then((res) => {
         setCartData(res);
-      });
+       });
+      }
     })
   };
 
@@ -52,12 +71,61 @@ export default function ShoppingCart() {
         error:false,
         msg:"Item are remove in the Cart"
        });
-       fetchDataFormApi(`/api/cart`).then((res) => {
-        setCartData(res);
-        setCartItem(res.length)
+       const user = JSON.parse(localStorage.getItem("user"));
+       if (user && user.userId) {
+         fetchDataFormApi(`/api/cart?userId=${user.userId}`).then((res) => {
+           setCartData(res);
+           setCartItem(res.length |[]);
+         });
+       }
       });
-     })
-  }
+  };
+   
+  const paymentCheckout = async () => {
+    try {
+      const stripe = await loadStripe('pk_test_51Pj0TRRpCUjioJ9qNvij6221a180t0AGrKAdDwtM3Gal9GqO6iBYAS6f2h5Uy5eg9I0A9hWxalgJygdA3ceCyswr00KczjbSFj');
+  
+      const cartProduct = cartData.map((product) => ({
+        productTitle: product.productTitle,
+        image: product.images,
+        price: product.price,
+        quantity: product.quantity
+      }));
+  
+      const userData = JSON.parse(localStorage.getItem("user"));
+  
+      const body = {
+        products: cartProduct,
+        userId: userData.userId
+      };
+  
+      const response = await fetch(`http://localhost:5000/api/checkout`, {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify(body)
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const session = await response.json();
+      console.log('Session:', session);
+  
+      const result = await stripe.redirectToCheckout({
+        sessionId: session.id
+      });
+  
+      if (result.error) {
+        console.error(result.error);
+      }
+    } catch (error) {
+      console.error("Failed to fetch", error);
+    }
+  };
+  
 
   return (
     <div className="container-fluid">
@@ -83,7 +151,7 @@ export default function ShoppingCart() {
               </tr>
             </thead>
             <tbody className="align-middle">
-              {cartData.map((item, index) => (
+              {cartData.length !==0 ? cartData.map((item, index) => (
                 <tr key={index}>
                   <td className="align-middle productName" >
                     <img src={item.images} alt="" />
@@ -127,7 +195,11 @@ export default function ShoppingCart() {
                     </button>
                   </td>
                 </tr>
-              ))}
+              )) : (
+                <div style={{fontSize:"18px", fontWeight:"600", margin:"auto"}}>
+                    Your Cart is empty
+                </div>
+              )}
             </tbody>
           </table>
         </div>
@@ -147,18 +219,18 @@ export default function ShoppingCart() {
                 <h6>Subtotal</h6>
                 <h6>RS {getCartTotal()}</h6>
               </div>
-              <div className="d-flex justify-content-between">
+              {/* <div className="d-flex justify-content-between">
                 <h6 className="font-weight-medium">Shipping</h6>
                 <h6 className="font-weight-medium">RS 10</h6>
-              </div>
+              </div> */}
             </div>
             <div className="pt-2">
               <div className="d-flex justify-content-between mt-2">
                 <h5>Total</h5>
-                <h5>RS {getCartTotal() + 10}</h5>
+                <h5>RS {getCartTotal()}</h5>
               </div>
-              <button className="btn btn-block btn-primary font-weight-bold my-3 py-3 " >
-                <Link to="/checkout" className="text-decoration-none" style={{color: "black"}}>Proceed To Checkout</Link>
+              <button className="btn btn-block btn-primary font-weight-bold my-3 py-3 " onClick={paymentCheckout} >
+                 Checkout
               </button>
             </div>
           </div>

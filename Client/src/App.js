@@ -16,6 +16,8 @@ import ProductListing from "./components/ProductListing";
 import { useEffect } from "react";
 import { Alert } from "@mui/material";
 import Snackbar from "@mui/material/Snackbar";
+import Cancel from "./components/Cancel";
+import PaymentSuccess from "./components/Success";
 
 function App() {
   const {
@@ -39,6 +41,7 @@ function App() {
   };
 
   useEffect(() => {
+    setisHeaderFooter(true);
     const token = localStorage.getItem("token");
     if (token !== null && token !== "") {
       setisLogin(true);
@@ -47,7 +50,7 @@ function App() {
     } else {
       setisLogin(false);
     }
-  }, [isLogin]);
+  }, [isLogin, setisHeaderFooter]);
 
   // const location = useLocation();
 
@@ -84,8 +87,8 @@ function App() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/signin" element={<Signin />} />
-        {/* <Route path='/signup' element={<Signup/>}/>
-            <Route path='/signin' element={<Signin/>}/> */}
+        <Route path='/payment/success' element={<PaymentSuccess/>}/>
+        <Route path='/cancel' element={<Cancel/>}/>
       </Routes>
       {isHeaderFooter === true && <Footer />}
     </div>

@@ -9,6 +9,12 @@ const CartsSchema = mongoose.Schema({
           type:String,
           required:true
     },
+    size:{
+        type:String,
+    },
+    ram:{
+        type:String,
+    },
     price:{
         type:Number,
         required:true,
@@ -29,6 +35,7 @@ const CartsSchema = mongoose.Schema({
         type:String,
         required:true,
     }
+    
 
 })
 

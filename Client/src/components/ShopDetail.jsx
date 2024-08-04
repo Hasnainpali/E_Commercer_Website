@@ -10,20 +10,24 @@ import { TfiFullscreen } from "react-icons/tfi";
 
 export default function ShopDetail() {
   const { setAlertBox } = useContext(UserContext);
-  const { AddtoCart , setCartItem } = useContext(CartContext);
-  const [products, setProduct] = useState({ images: [], productSize:[], productRAMS:[]});
+  const { AddtoCart } = useContext(CartContext);
+  const [products, setProduct] = useState({
+    images: [],
+    productSize: [],
+    productRAMS: [],
+  });
   const [relatedProduct, setRelatedProduct] = useState([]);
-  const [rating, setRating] = useState(1)
-  const [selectedSize, setSelectedSize] = useState('')
-  const [selectedRam, setSelectedRam] = useState('')
+  const [rating, setRating] = useState(1);
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedRam, setSelectedRam] = useState("");
   const [inputVal, setInputVal] = useState(1);
-  const [reviewData,setReviewData] = useState([])
+  const [reviewData, setReviewData] = useState([]);
   let [reviews, setReviews] = useState({
-    productId:"",
-    customerName:"",
-    customerId:"",
-    Review:"",
-    customerRating:""
+    productId: "",
+    customerName: "",
+    customerId: "",
+    Review: "",
+    customerRating: "",
   });
   const [productQty, setProductQty] = useState(1);
   const { id } = useParams();
@@ -47,12 +51,30 @@ export default function ShopDetail() {
     slidesToScroll: 1,
     arrows: false,
   };
+    
+  useEffect(() => {
+    fetchDataFormApi(`/api/productReview?productId=${id}`).then((res) => {
+      setReviewData(res);
+    });
+  }, [id]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    fetchDataFormApi(`/api/products/${id}`).then((res) => {
+      setProduct(res);
+      fetchDataFormApi(`/api/products?catID=${res?.catID}`).then((res) => {
+        const filterProduct = res?.productList?.filter(
+          (item) => item.id !== id
+        );
+        setRelatedProduct(filterProduct);
+      });
+    });
+  }, [id]);
+  
   const GoToSlider = (index) => {
     ProductSliderBig.current.slickGoTo(index);
     ProductSliderSml.current.slickGoTo(index);
   };
-
 
   const handleSizeChange = (e) => {
     setSelectedSize(e.target.value);
@@ -62,94 +84,101 @@ export default function ShopDetail() {
     setSelectedRam(e.target.value);
   };
 
-   const qunatity =(val)=>{
-       setProductQty(val)
-   }
-
-   useEffect(()=>{
-     qunatity(inputVal)
-   },[inputVal]);
-
-  const minus = ()=>{
-     if(inputVal !== 1 && inputVal>0){
-       setInputVal(inputVal - 1)
-     }
+  const qunatity = (val) => {
+    setProductQty(val);
   };
-  const plus = ()=>{
-     setInputVal(inputVal + 1)
- }
 
- const addtoCart = (data)=>{
-  if (data.productSize.length > 0 && !selectedSize) {
-    setAlertBox({
-      open:true,
-      error:true,
-      msg:"Select the Size"
+  useEffect(() => {
+    qunatity(inputVal);
+  }, [inputVal]);
 
-    })
-    return;
-  }
-  if (data.productRAMS.length > 0 && !selectedRam) {
-    setAlertBox({
-      open:true,
-      error:true,
-      msg:"Select the Ram"
+  const minus = () => {
+    if (inputVal !== 1 && inputVal > 0) {
+      setInputVal(inputVal - 1);
+    }
+  };
+  const plus = () => {
+    setInputVal(inputVal + 1);
+  };
 
-    })
-    return;
-  }
-  const user = JSON.parse(localStorage.getItem("user"));
-   const cartItems ={
-    productTitle : data?.name,
-    images : data?.images[0],
-    price : data?.price,
-    quantity : productQty,
-    subTotal : parseInt(data?.price * productQty),
-    productId : data?.id,
-    userId : user?.userId,
-    size: selectedSize,
-    ram: selectedRam,
-   }
-   AddtoCart(cartItems)
+  const addtoCart = (data) => {
+    if (data.productSize.length > 0 && !selectedSize) {
+      setAlertBox({
+        open: true,
+        error: true,
+        msg: "Select the Size",
+      });
+      return;
+    }
+    if (data.productRAMS.length > 0 && !selectedRam) {
+      setAlertBox({
+        open: true,
+        error: true,
+        msg: "Select the Ram",
+      });
+      return;
+    }
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) {
+      setAlertBox({
+        open: true,
+        error: true,
+        msg: "You are not Login so firstly you are login then purchase item"
+      });
+      return;
+    }
+    const cartItems = {
+      productTitle: data?.name,
+      images: data?.images[0],
+      price: data?.price,
+      quantity: productQty,
+      subTotal: parseInt(data?.price * productQty),
+      productId: data?.id,
+      userId: user?.userId,
+      size: selectedSize,
+      ram: selectedRam,
+    };
+    
+    console.log("Adding to cart:", cartItems); // Debug log
+    
+    AddtoCart(cartItems);
+  };
+  
+  const onChangeInput = (e) => {
+    setReviews(() => ({
+      ...reviews,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
- };
+  const onChangeRating = (e) => {
+    const ratingValue = parseInt(e.target.value, 10);
+    setRating(ratingValue);
+    setReviews((prevReviews) => ({
+      ...prevReviews,
+      customerRating: ratingValue,
+    }));
+  };
 
- const onChangeInput = (e) => {
-    setReviews(()=>({
-       ...reviews,
-       [e.target.name]: e.target.value
-    }))
-};
-
-const onChangeRating = (e)=>{
-  setRating(e.target.value)
-   reviews.customerRating = (e.target.value)
-}
-
-const addReview = (e) =>{
-   e.preventDefault()
-   const user = JSON.parse(localStorage.getItem("user"));
-    postdata('/api/productReview/add', reviews).then((res) => {
-      // setReviews({
-      //   Review: "",
-      //   customerRating: 1,
-      // });
+  const addReview = (e) => {
+    e.preventDefault();
+    const user = JSON.parse(localStorage.getItem("user"));
+    reviews.customerId = user.userId;
+    reviews.productId = id;
+    reviews.customerName = user.name;
+    postdata("/api/productReview/add", reviews).then((res) => {
+      console.log(res);
+      setReviews({
+        Review: "",
+        customerRating: 1,
+      });
       fetchDataFormApi(`/api/productReview?productId=${id}`).then((res) => {
         setReviewData(res);
       });
     });
-}
+  };
 
-  useEffect(() => {
-    window.scrollTo(0, 0)
-    fetchDataFormApi(`/api/products/${id}`).then((res) => {
-      setProduct(res);
-      fetchDataFormApi(`/api/products?catID=${res?.catID}`).then((res) =>{
-          const filterProduct = res?.productList?.filter(item => item.id !== id);
-            setRelatedProduct(filterProduct);
-      });
-    });
-  }, [id]);
+
 
   return (
     <div className="container-fluid pb-5">
@@ -183,11 +212,7 @@ const addReview = (e) =>{
                   >
                     {products.images.map((item, index) => (
                       <div className="item" key={index}>
-                        <img
-                          className="w-100"
-                          src={item}
-                          alt={""}
-                        />
+                        <img className="w-100" src={item} alt={""} />
                       </div>
                     ))}
                   </Slider>
@@ -204,11 +229,7 @@ const addReview = (e) =>{
                         key={index}
                         onClick={() => GoToSlider(index)}
                       >
-                        <img
-                          className="w-100"
-                          src={item}
-                          alt={""}
-                        />
+                        <img className="w-100" src={item} alt={""} />
                       </div>
                     ))}
                   </Slider>
@@ -221,7 +242,7 @@ const addReview = (e) =>{
             <div className="h-100 bg-light p-30">
               <h3>{products.name} </h3>
               <h6 className="font-weight-bold my-3">
-                  Brand : {products.brand}  
+                Brand : {products.brand}
               </h6>
               <div className="d-flex mb-3">
                 <Rating
@@ -237,13 +258,19 @@ const addReview = (e) =>{
                   <del>{products.oldPrice}</del>
                 </h3>
               </div>
-              <p className="mb-4"><span className="font-weight-bold">Description : </span>{products.description}</p>
+              <p className="mb-4">
+                <span className="font-weight-bold">Description : </span>
+                {products.description}
+              </p>
               {products.productSize && products.productSize.length > 0 && (
                 <div className="d-flex mb-3">
                   <strong className="text-dark mr-3">Sizes:</strong>
                   <div className="pt-1">
                     {products.productSize.map((item, index) => (
-                      <div className={`custom-control custom-radio custom-control-inline `} key={index}>
+                      <div
+                        className={`custom-control custom-radio custom-control-inline `}
+                        key={index}
+                      >
                         <input
                           type="radio"
                           className="custom-control-input"
@@ -252,7 +279,10 @@ const addReview = (e) =>{
                           value={item}
                           onChange={handleSizeChange}
                         />
-                        <label className="custom-control-label" htmlFor={`size-${index}`}>
+                        <label
+                          className="custom-control-label"
+                          htmlFor={`size-${index}`}
+                        >
                           {item}
                         </label>
                       </div>
@@ -265,7 +295,10 @@ const addReview = (e) =>{
                   <strong className="text-dark mr-3">Rams:</strong>
                   <div className="pt-1">
                     {products.productRAMS.map((item, index) => (
-                      <div className="custom-control custom-radio custom-control-inline" key={index}>
+                      <div
+                        className="custom-control custom-radio custom-control-inline"
+                        key={index}
+                      >
                         <input
                           type="radio"
                           className="custom-control-input"
@@ -274,7 +307,10 @@ const addReview = (e) =>{
                           value={item}
                           onChange={handleRamChange}
                         />
-                        <label className="custom-control-label" htmlFor={`ram-${index}`}>
+                        <label
+                          className="custom-control-label"
+                          htmlFor={`ram-${index}`}
+                        >
                           {item}
                         </label>
                       </div>
@@ -288,7 +324,10 @@ const addReview = (e) =>{
                   style={{ width: "130px" }}
                 >
                   <div className="input-group-btn">
-                    <button className="btn btn-primary btn-minus" onClick={minus}>
+                    <button
+                      className="btn btn-primary btn-minus"
+                      onClick={minus}
+                    >
                       <i className="fa fa-minus"></i>
                     </button>
                   </div>
@@ -421,39 +460,37 @@ const addReview = (e) =>{
                 <div className="tab-pane fade" id="tab-pane-3">
                   <div className="row">
                     <div className="col-md-6">
-                    {reviewData.map((item,index)=>{
-                    return(
-                      <div className="media mb-4" key={index}>
-                        <div className="user-img mr-2">
-                        <span className="rounded-circle">
-                           {item.customerName.charAt(0)}
-                         </span>
-                        </div>
-                        <div className="media-body">
-                          <h6>
-                           {item.customerName}
-                            <small>
-                              {" "}
-                              - <i>{item.dateCreated}</i>
-                            </small>
-                          </h6>
-                          <div className="text-primary mb-2">
-                            <Rating value={item.customerRating}/>
+                      {reviewData?.map((item, index) => {
+                        return (
+                          <div className="media mb-4" key={index}>
+                            <div className="user-img mr-2">
+                              <span className="rounded-circle">
+                                {item.customerName.charAt(0)}
+                              </span>
+                            </div>
+                            <div className="media-body">
+                              <h6>
+                                {item.customerName}
+                                <small>
+                                  {" "}
+                                  - <i>{item.dateCreated}</i>
+                                </small>
+                              </h6>
+                              <div className="text-primary mb-2">
+                                <Rating value={item.customerRating} />
+                              </div>
+                              <p>{item.Review}</p>
+                            </div>
                           </div>
-                          <p>
-                           {item.Review}
-                          </p>
-                        </div>
-                      </div>
-                        )
-                     })}
+                        );
+                      })}
                     </div>
                     <div className="col-md-6">
                       <h4 className="mb-4">Leave a review</h4>
                       <small>
                         Your email address will not be published. Required
                         fields are marked *
-                      </small>   
+                      </small>
                       <form onSubmit={addReview}>
                         <div className="form-group">
                           <label for="message">Your Review *</label>
@@ -476,8 +513,13 @@ const addReview = (e) =>{
                           />
                         </div> */}
                         <div className="d-flex my-3">
-                          <Rating name="customerRating" onChange={onChangeRating} value={rating} precision={0.5}  />
-                       </div>
+                          <Rating
+                            name="customerRating"
+                            onChange={onChangeRating}
+                            value={rating}
+                            precision={0.5}
+                          />
+                        </div>
                         {/* <div className="form-group">
                           <label for="email">Your Email *</label>
                           <input
@@ -489,8 +531,9 @@ const addReview = (e) =>{
                         <div className="form-group mb-0">
                           <button
                             type="submit"
-                            className="btn btn-primary px-3">
-                              Submit Review
+                            className="btn btn-primary px-3"
+                          >
+                            Submit Review
                           </button>
                         </div>
                       </form>
@@ -510,64 +553,76 @@ const addReview = (e) =>{
                   {description}
                 </p> */}
               </div>
-           </div>
-              <div className="relatedProduct mt-4">
-                {relatedProduct.length !== 0 && relatedProduct.map((products, index) => {
+            </div>
+            <div className="relatedProduct mt-4">
+              {relatedProduct?.length !== 0 &&
+                relatedProduct?.map((products, index) => {
                   return (
-                      <div className="product-item bg-light mb-4" key={index}>
-                        <div className="product-img position-relative overflow-hidden px-2"  onClick={() => navigate(`/product/detail/${products.id}`)}>
-                          <img
-                            className="img-fluid product-imgs"
-                            src={products.images[0]}
-                            alt={products.name}
-                          />
-                         {
-                           products.discount ? 
-                            <span className="badelandingpage bg-primary">{products.discount}%</span>
-                             :
-                           null
-                          }
-                          <div className="product-action1 ">
-                            <a
-                              className="btn btn-outline-dark btn-square"
-                              href="/"
-                            >
-                                <TfiFullscreen/>
-                            </a>
-                            <a
-                              className="btn btn-outline-dark btn-square mt-2"
-                              href="/"
-                            >
-                             <IoMdHeartEmpty/>
-                            </a>
-                          </div>
+                    <div className="product-item bg-light mb-4" key={index}>
+                      <div
+                        className="product-img position-relative overflow-hidden px-2"
+                        onClick={() =>
+                          navigate(`/product/detail/${products.id}`)
+                        }
+                      >
+                        <img
+                          className="img-fluid product-imgs"
+                          src={products.images[0]}
+                          alt={products.name}
+                        />
+                        {products.discount ? (
+                          <span className="badelandingpage bg-primary">
+                            {products.discount}%
+                          </span>
+                        ) : null}
+                        <div className="product-action1 ">
+                          <a
+                            className="btn btn-outline-dark btn-square"
+                            href="/"
+                          >
+                            <TfiFullscreen />
+                          </a>
+                          <a
+                            className="btn btn-outline-dark btn-square mt-2"
+                            href="/"
+                          >
+                            <IoMdHeartEmpty />
+                          </a>
+                        </div>
 
-                          <div className="d-flex flex-column text-center py-4">
-                            <a
-                              className="h6 text-decoration-none text-truncate"
-                              href="/"
-                            >
-                              {products.name.substring(0, 25)}
-                            </a>
-                            <span className="text-success h6 font-weight-semibold"> In Stock</span>
-                            <div className="d-flex align-items-center justify-content-center mb-1">
-                            <Rating name="read-only" value={products.rating} precision={0.5} readOnly />
-                            </div>
-                            <div className="d-flex align-items-center justify-content-center mt-2">
-                             
-                              <h5>Rs{products.price}</h5>
-                              <h6 className="text-muted ml-2">
-                                <del>Rs{products.oldPrice}</del>
-                              </h6>
-                            </div>
+                        <div className="d-flex flex-column text-center py-4">
+                          <a
+                            className="h6 text-decoration-none text-truncate"
+                            href="/"
+                          >
+                            {products.name.substring(0, 25)}
+                          </a>
+                          <span className="text-success h6 font-weight-semibold">
+                            {" "}
+                            In Stock
+                          </span>
+                          <div className="d-flex align-items-center justify-content-center mb-1">
+                            <Rating
+                              name="read-only"
+                              value={products.rating}
+                              precision={0.5}
+                              readOnly
+                            />
+                          </div>
+                          <div className="d-flex align-items-center justify-content-center mt-2">
+                            <h5>Rs{products.price}</h5>
+                            <h6 className="text-muted ml-2">
+                              <del>Rs{products.oldPrice}</del>
+                            </h6>
                           </div>
                         </div>
                       </div>
+                    </div>
                   );
                 })}
-              </div>
             </div>
           </div>
+        </div>
       </div>
     </div>
   );

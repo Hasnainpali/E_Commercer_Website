@@ -20,10 +20,13 @@ router.get("/", async (req, res) => {
 
 router.post("/add", async (req, res) => {
   try {
-    const existingCart = await Carts.find({ productId: req.body.productId });
+    const existingCart = await Carts.find({
+      productId: req.body.productId,
+      userId: req.body.userId
+    });
 
     if (existingCart.length > 0) {
-      return res.status(409).json({ error: true, msg: "This product is already in the cart" });
+      return res.status(409).json({ error: true, msg: "This product is already in the cart for this user" });
     }
 
     let cartItem = new Carts({
@@ -34,15 +37,18 @@ router.post("/add", async (req, res) => {
       subTotal: req.body.subTotal,
       productId: req.body.productId,
       userId: req.body.userId,
+      size: req.body.size,
+      ram: req.body.ram
     });
 
     cartItem = await cartItem.save();
     res.status(201).json(cartItem);
+
   } catch (error) {
+
     res.status(500).json({ error: error.message, success: false });
   }
 });
-
 
 router.delete("/:id", async (req, res) => {
   try {
@@ -76,6 +82,8 @@ router.put("/:id", async (req, res) => {
       subTotal: req.body.subTotal,
       productId: req.body.productId,
       userId: req.body.userId,
+      size: req.body.size,
+      ram:req.body.ram
       },
       { new: true }
     );

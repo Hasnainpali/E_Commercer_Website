@@ -205,8 +205,8 @@ export default function Shop() {
                 <ProductBar count={6} />
               ) : (
                 <>
-                  {filteredData.length > 0 &&
-                    filteredData.map((product) => (
+                  {filteredData?.length > 0 &&
+                    filteredData?.map((product) => (
                       <div
                         className="d-flex flex-wrap ml-3 product-item bg-light mb-4"
                         key={product.id}
