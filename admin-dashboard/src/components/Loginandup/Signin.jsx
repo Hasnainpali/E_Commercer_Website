@@ -116,7 +116,7 @@ export default function Signin() {
 
       setTimeout(() => {
         setLoading(false)
-        window.location.href = '/dashboard'
+        window.location.href = '/'
         setAlertBox({
           open: true,
           error: false,

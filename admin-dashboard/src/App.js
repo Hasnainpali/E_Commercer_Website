@@ -100,7 +100,6 @@ function App() {
           </Snackbar>
           <Routes>
             <Route path="/" exact element={<DashBoard />} />
-            <Route path="/dashboard" exact element={<DashBoard />} />
             <Route path="/signin" exact element={<Signin />} />
             <Route path="/Product-list" exact element={<ProductList />} />
             <Route path="/Product-view/:id" exact element={<ProductDetail />} />
