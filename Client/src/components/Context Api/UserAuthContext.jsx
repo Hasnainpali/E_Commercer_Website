@@ -15,7 +15,7 @@ export const UserProvide = ({children}) =>{
         name:"",
         email:""
     })
-    const BaseURl = "http://localhost:5000"
+    const BaseURl = "https://full-stack-ecommerce-server.vercel.app"
 
     return(
         <UserContext.Provider value={{

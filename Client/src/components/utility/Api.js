@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const fetchDataFormApi = async (url)=>{ 
        try{
-        const {data} = await axios.get("http://localhost:5000"+url);
+        const {data} = await axios.get("https://full-stack-ecommerce-server.vercel.app"+url);
         return data;
        }
        catch(error){
@@ -12,23 +12,23 @@ export const fetchDataFormApi = async (url)=>{
 };
 
 // export const postdata = async (url,formData)=>{
-//      const {res} = await axios.post("http://localhost:5000"+url,formData);
+//      const {res} = await axios.post("https://full-stack-ecommerce-server.vercel.app"+url,formData);
 //      return res;  
 // };
 
 export const editdata = async (url,updatedData)=>{
-     const {res} = await axios.put("http://localhost:5000"+url,updatedData);
+     const {res} = await axios.put("https://full-stack-ecommerce-server.vercel.app"+url,updatedData);
      return res;  
 };
 
 export const deletedata = async (url)=>{
-     const {res} = await axios.delete("http://localhost:5000"+ url);
+     const {res} = await axios.delete("https://full-stack-ecommerce-server.vercel.app"+ url);
      return res;  
 };
 
 export const postdata = async (url, formData) => {
      try {
-       const response = await fetch("http://localhost:5000" + url, {
+       const response = await fetch("https://full-stack-ecommerce-server.vercel.app" + url, {
          method: "POST",
          body: JSON.stringify(formData),
          headers: {
