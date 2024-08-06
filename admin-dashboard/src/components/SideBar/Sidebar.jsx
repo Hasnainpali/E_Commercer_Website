@@ -1,4 +1,4 @@
-import React, {  useState } from "react";
+import React, {  useContext, useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import {
   FaAngleRight,
@@ -8,14 +8,25 @@ import {
 } from "react-icons/fa";
 import { MdDashboard, MdMessage } from "react-icons/md";
 import { IoIosSettings } from "react-icons/io";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { UserContext } from "../contextApi/UserAuthContext";
 
 
 function Sidebar() {
   const [activeTab, setActiveTab] = useState(0);
   const [isToggleSubmenu, setisToggleSubmenu] = useState(false);
+  const {setisLogin} = useContext(UserContext)
+  const navigate = useNavigate()
 
   
+  useEffect(()=>{
+    const token = localStorage.getItem("token");
+    if(token !== null && token !==""){
+      setisLogin(true)
+    }else{
+      navigate('/signin')
+    }
+  },[])
 
   const isOpenSubMenu = (index) => {
     setActiveTab(index);
@@ -68,9 +79,9 @@ function Sidebar() {
                 <li>
                   <Link to="/Product-list">Product List</Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link to="/Product-view">Product View</Link>
-                </li>
+                </li> */}
                 <li>
                   <Link to="/Product-upload">Product Upload</Link>
                 </li>
@@ -109,7 +120,7 @@ function Sidebar() {
             </div>
           </li>
           <li>
-            <Link to="/cart">
+            <Link to="/Order-List">
               <Button
                 className={`w-100 ${activeTab === 3 ? "active" : ""}`}
                 onClick={() => isOpenSubMenu(3)}
@@ -126,7 +137,6 @@ function Sidebar() {
             </Link>
           </li>
           <li>
-            <Link to="/message">
               <Button
                 className={`w-100 ${activeTab === 4 ? "active" : ""}`}
                 onClick={() => isOpenSubMenu(4)}
@@ -140,10 +150,9 @@ function Sidebar() {
                   <FaAngleRight />
                 </span> */}
               </Button>
-            </Link>
+           
           </li>
           <li>
-            <Link to="/notification">
               <Button
                 className={`w-100 ${activeTab === 5 ? "active" : ""}`}
                 onClick={() => isOpenSubMenu(5)}
@@ -157,10 +166,10 @@ function Sidebar() {
                   <FaAngleRight />
                 </span> */}
               </Button>
-            </Link>
+           
           </li>
           <li>
-            <Link to="/setting">
+            
               <Button
                 className={`w-100 ${activeTab === 6 ? "active" : ""}`}
                 onClick={() => isOpenSubMenu(6)}
@@ -174,7 +183,7 @@ function Sidebar() {
                   <FaAngleRight />
                 </span> */}
               </Button>
-            </Link>
+            
           </li>
         </ul>
       </div>

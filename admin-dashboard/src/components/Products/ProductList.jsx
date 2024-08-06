@@ -27,6 +27,7 @@ export default function ProductList() {
     const [categoryBy, setcategoryBy] = useState("");
     const [categoryData, setcategoryData] = useState([]);
     const [productList, setProductList] = useState([])
+    const [page ,setPage] = useState(1)
   
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
@@ -73,8 +74,9 @@ export default function ProductList() {
     };
 
     const changePagintionData = (event,value) =>{
+      setPage(value)
       setProgress(40)
-      fetchDataFormApi(`/api/products?page=${value}`).then((res) => {
+      fetchDataFormApi(`/api/products?page=${value}&perpage=7`).then((res) => {
           setProductList(res);
           setProgress(100)
         });
@@ -121,7 +123,7 @@ export default function ProductList() {
         <div className="card shadow border-0 p-3 mt-4">
           <h3 className="hd"> Best Selling Products</h3>
 
-          <div className="row cardFilter mt-3">
+          {/* <div className="row cardFilter mt-3">
             <div className="col-md-3 ">
             <FormControl className="w-100">
               <h4>Show By</h4>
@@ -163,7 +165,7 @@ export default function ProductList() {
                 </Select>
                 </FormControl>
             </div>
-          </div>
+          </div> */}
 
           <div className="table-responsive mt-3 ">
              <table className="table table-bordered  v-align">
@@ -235,7 +237,7 @@ export default function ProductList() {
                     <td> 30 </td>
                     <td>
                        <div className="d-flex justify-content-center align-items-center actions">
-                           <Link to='/Product-view'>
+                           <Link to={`/Product-view/${item.id}`}>
                             <Button className="secondary" color='secondary'> <FaEye/> </Button>
                            </Link>
                            <Link to={`/Product-Edit/${item.id}`}>

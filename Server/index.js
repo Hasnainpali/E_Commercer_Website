@@ -59,7 +59,9 @@ const productRoutes = require('./routes/products');
 const ImagesUpload = require("./helper/ImagesUpload")
 const cart = require("./routes/carts.js");
 const productReview = require('./routes/productReview.js');
-const checkoutPayment = require('./routes/checkout.js')
+const checkoutPayment = require('./routes/checkout.js');
+const orderList = require('./routes/order.js')
+const searchProduct= require('./routes/search.js')
 
 
 app.use('/uploads',express.static("uploads"));
@@ -69,7 +71,9 @@ app.use('/api/products',productRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/cart', cart);
 app.use('/api/productReview', productReview);
-app.use('/api/checkout', checkoutPayment)
+app.use('/api/checkout', checkoutPayment);
+app.use('/api/order', orderList);
+app.use('/api/search', searchProduct);
 
 app.listen(process.env.port,()=>{
     console.log(`Server is running Port ${process.env.port}`)

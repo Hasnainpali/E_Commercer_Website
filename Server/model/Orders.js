@@ -17,8 +17,9 @@ const OrdersSchema = mongoose.Schema({
         city: { type: String, default: "" },
         state: { type: String, default: "" },
         postalCode: { type: String, default: "" },
-        country: { type: String, default: "" },
+        country: { type: String, default: "" }, 
       },
+    status:{type:String, default:"Pending"},
     totalAmount: { type: Number, default: "" },
     createdAt: { type: Date, default: Date.now },
 })

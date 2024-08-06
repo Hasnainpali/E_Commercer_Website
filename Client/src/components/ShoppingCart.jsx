@@ -86,10 +86,12 @@ export default function ShoppingCart() {
       const stripe = await loadStripe('pk_test_51Pj0TRRpCUjioJ9qNvij6221a180t0AGrKAdDwtM3Gal9GqO6iBYAS6f2h5Uy5eg9I0A9hWxalgJygdA3ceCyswr00KczjbSFj');
   
       const cartProduct = cartData.map((product) => ({
+        productId:product.productId,
         productTitle: product.productTitle,
         image: product.images,
         price: product.price,
-        quantity: product.quantity
+        quantity: product.quantity,
+        subTotal:parseInt(product.price * product.quantity)
       }));
   
       const userData = JSON.parse(localStorage.getItem("user"));

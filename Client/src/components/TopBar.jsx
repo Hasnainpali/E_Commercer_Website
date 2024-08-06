@@ -158,12 +158,12 @@ function TopBar() {
                   </ListItemIcon>
                   My Order
                 </MenuItem>
-                <MenuItem onClick={closeMyAccdrop}>
+                {/* <MenuItem onClick={closeMyAccdrop}>
                   <ListItemIcon>
                     <FaHeart />
                   </ListItemIcon>
                   My List
-                </MenuItem>
+                </MenuItem> */}
                 <MenuItem onClick={logout}>
                   <ListItemIcon>
                   <MdLogout />
@@ -232,14 +232,14 @@ function TopBar() {
                   <ListItemIcon>
                     <FaClipboardCheck />
                   </ListItemIcon>
-                  My Order
+                    <span onClick={() => navigate('/order-page')}>My Order</span>
                 </MenuItem>
-                <MenuItem onClick={closeMyAccdrop}>
+                {/* <MenuItem onClick={closeMyAccdrop}>
                   <ListItemIcon>
                     <FaHeart />
                   </ListItemIcon>
                   My List
-                </MenuItem>
+                </MenuItem> */}
                 <MenuItem onClick={logout}>
                   <ListItemIcon>
                   <MdLogout />

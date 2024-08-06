@@ -75,6 +75,11 @@ export default function ShopDetail() {
     ProductSliderBig.current.slickGoTo(index);
     ProductSliderSml.current.slickGoTo(index);
   };
+  
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Intl.DateTimeFormat("en-US", options).format(new Date(dateString));
+  };
 
   const handleSizeChange = (e) => {
     setSelectedSize(e.target.value);
@@ -178,7 +183,7 @@ export default function ShopDetail() {
     });
   };
 
-
+  const reviewCount = reviewData.length;
 
   return (
     <div className="container-fluid pb-5">
@@ -393,7 +398,7 @@ export default function ShopDetail() {
                   data-toggle="tab"
                   href="#tab-pane-3"
                 >
-                  Reviews()
+                  Reviews({reviewCount})
                 </a>
               </div>
               <div className="tab-content">
@@ -473,7 +478,7 @@ export default function ShopDetail() {
                                 {item.customerName}
                                 <small>
                                   {" "}
-                                  - <i>{item.dateCreated}</i>
+                                  - <i>{formatDate(item.dateCreated)}</i>
                                 </small>
                               </h6>
                               <div className="text-primary mb-2">

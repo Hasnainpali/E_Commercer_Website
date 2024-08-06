@@ -156,7 +156,7 @@ fetchDataFormApi(`/api/products?page=${value}`).then((res) => {
         <div className="card shadow border-0 p-3 mt-4">
           <h3 className="hd"> Best Selling Products</h3>
 
-          <div className="row cardFilter mt-3">
+          {/* <div className="row cardFilter mt-3">
             <div className="col-md-3 ">
             <FormControl className="w-100">
               <h4>Show By</h4>
@@ -225,18 +225,21 @@ fetchDataFormApi(`/api/products?page=${value}`).then((res) => {
                 </Select>
                 </FormControl>
             </div>
-          </div>
+          </div> */}
 
           <div className="table-responsive mt-3 ">
              <table className="table table-bordered  v-align">
              <thead className="thead-dark">
-                <tr>
+             <tr>
                   <th>ID</th>
                   <th style={{ width:'200px'}} >Product</th>
                   <th>Category</th>
                   <th>Brand</th>
                   <th>Price</th>
                   <th>Rating</th>
+                  <th>Discount</th>
+                  <th>Product Size</th>
+                  <th>Product RAM</th>
                   <th>Stock</th>
                   <th>Order</th>
                   <th>Action</th>
@@ -244,23 +247,23 @@ fetchDataFormApi(`/api/products?page=${value}`).then((res) => {
              </thead>
               <tbody>
                 {productList?.productList?.length !== 0 && productList?.productList?.map((item,index)=>{
-                   return(
+                  return(
                     <tr key={index}>
                     <td>#{index + 1}</td>
                     <td>
-                       <div className="d-flex  align-items-center productBox">
+                       <div className="d-flex align-items-center productBox">
                           <div className="imgWrapper mx-1">
                              <div className="img ">
                              <img
-                                src={`${BaseURl}/uploads/${item.images[1]}`}
+                                src={item.images[0]}
                                 alt={''}
                                 className="w-100"
                              />
                              </div>
                           </div>
                           <div className="info pl-0">
-                             <h6>{item.name.substring(0,15)}</h6>
-                             <p>{item.description.substring(0,18)}</p>
+                             <h6>{item.name.substring(0,10)}</h6>
+                             <p>{item.description.substring(0,15)}</p>
                           </div>
                        </div>
                     </td>
@@ -273,6 +276,23 @@ fetchDataFormApi(`/api/products?page=${value}`).then((res) => {
                        </div>
                     </td>
                     <td><Rating name="read-only" defaultValue={item.rating} precision={0.5} readOnly /></td>
+                    <td>{item.discount}</td>
+                    <td> {item?.productSize.map((size)=>{
+                      return(
+                        <span className="bage">
+                          {size}
+                        </span>
+                      )
+                      })}
+                    </td>
+                    <td> {item?.productRAMS.map((Rams)=>{
+                      return(
+                        <span className="bage">
+                          {Rams}
+                        </span>
+                      )
+                      })}
+                    </td>
                     <td>{item.countInStock}</td>
                     <td> 30 </td>
                     <td>
@@ -280,7 +300,9 @@ fetchDataFormApi(`/api/products?page=${value}`).then((res) => {
                            <Link to='/Product-view'>
                             <Button className="secondary" color='secondary'> <FaEye/> </Button>
                            </Link>
-                            <Button className="success" color='success'> <FaPencilAlt/> </Button>
+                           <Link to={`/Product-Edit/${item.id}`}>
+                           <Button className="success" color='success'> <FaPencilAlt/> </Button>
+                           </Link>
                             <Button className="error" color='error'onClick={()=>deleteProduct(item.id)}> <MdDelete/> </Button>
                        </div>
                     </td>

@@ -18,6 +18,7 @@ import { Alert } from "@mui/material";
 import LoadingBar from 'react-top-loading-bar'
 import CategoryEdit from "./components/Category/CategoryEdit";
 import ProductEdit from "./components/Products/ProductEdit";
+import OrderList from "./components/Order/OrderList";
 
 function App() {
   const { isToggleSidebr, themeMode } = useContext(SidebarContext);
@@ -102,12 +103,13 @@ function App() {
             <Route path="/dashboard" exact element={<DashBoard />} />
             <Route path="/signin" exact element={<Signin />} />
             <Route path="/Product-list" exact element={<ProductList />} />
-            <Route path="/Product-view" exact element={<ProductDetail />} />
+            <Route path="/Product-view/:id" exact element={<ProductDetail />} />
             <Route path="/Product-upload" exact element={<ProductUpload />} />
             <Route path="/Product-Edit/:id" exact element={<ProductEdit />} />
             <Route path="/Add-Category" exact element={<CategoryUpload />} />
             <Route path="/Edited-Category/:id" exact element={<CategoryEdit />} />
             <Route path="/Category-list" exact element={<CategoryList />} />
+            <Route path="/Order-list" exact element={<OrderList />} />
           </Routes>
         </div>
       </div>

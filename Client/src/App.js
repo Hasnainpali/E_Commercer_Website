@@ -18,6 +18,7 @@ import { Alert } from "@mui/material";
 import Snackbar from "@mui/material/Snackbar";
 import Cancel from "./components/Cancel";
 import PaymentSuccess from "./components/Success";
+import OrderPage from "./components/OrderPage";
 
 function App() {
   const {
@@ -85,6 +86,7 @@ function App() {
         <Route path="/product/detail/:id" element={<ShopDetail />} />
         <Route path="/shopping-cart" element={<ShoppingCart />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/order-page" element={<OrderPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/signin" element={<Signin />} />
         <Route path='/payment/success' element={<PaymentSuccess/>}/>
